@@ -157,7 +157,6 @@ int main(int argc, char* argv[]) {
 
     // =====================================================================
     // DEMO VARIABLES: Edit these target values for the Demo
-    
     // =====================================================================
     // Pick an existing key from the dataset for the "Found" demo
     long long target_found = raw_data[0].first; 

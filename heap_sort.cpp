@@ -1,5 +1,5 @@
 /*
-Program : dataset_generator.cpp
+Program : heap_sort.cpp
 Course: CCP6214 Algorithm Design and Analysis
  Lecture Class: TC6L
  Tutorial Class: T21L
@@ -26,6 +26,10 @@ Write the dataset generator program
 Implement Radix Sort (both the step-by-step version and the full sort)
 Document radix sort's time/space complexity
 Run experiments for radix sort on 10+ input sizes
+
+run code:
+1. g++ -O3 heap_sort.cpp -o heap_sort
+2. ./heap_sort <dataset size>
 
 */
 
@@ -136,7 +140,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    cout << "Dataset loaded successfully. Starting Heap Sort..." << endl;
+    cout << "Dataset loaded successfully. Commencing Heap Sort..." << endl;
 
     auto start_time = chrono::high_resolution_clock::now(); // start running time record
     heapSort(dataset); //sort data
@@ -144,10 +148,10 @@ int main(int argc, char* argv[])
 
     // Calculate execution duration in seconds
     chrono::duration<double> duration = end_time - start_time;
-    cout << "\n==========================================" << endl;
+    cout << "\n-----------------------------------------" << endl;
     cout << "Dataset Size: " << sizeStr << endl;
     cout << "Heap Sort Execution Time: " << duration.count() << " seconds" << endl;
-    cout << "==========================================\n" << endl;
+    cout << "-----------------------------------------\n" << endl;
 
     // Write the sorted array back into a CSV file
     cout << "Writing sorted data to: " << outputFilename << "..." << endl;
@@ -157,7 +161,7 @@ int main(int argc, char* argv[])
             outFile << rec.id << "," << rec.key << "\n";
         }
         outFile.close();
-        cout << "Sorting and file write completed successfully! :>" << endl;
+        cout << "Sorting and file write completed! :D \n" << endl;
     } else {
         cerr << "Error: Could not write output file!" << endl;
     }

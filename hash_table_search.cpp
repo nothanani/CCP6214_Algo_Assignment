@@ -3,6 +3,7 @@ Program : hash_table_search.cpp
 Course: CCP6214 Algorithm Design and Analysis
 Lecture Class: TC6L
 Tutorial Class: T21L
+
 Trimester: 2610
 Member_1: 242UC244PT | JASMYNE YAP | jasmyne.yap@student.mmu.edu.my | 01163464323
 Member_2: 242UC244L8 | VIDHYA DARINEY A/P RAJASINGAM | vidhya.dariney.rajasingam@student.mmu.edu.my | 0176506405
@@ -34,6 +35,9 @@ how to run!!
 ********************************************************************************************
 */
 
+// This program reads a dataset file, stores the keys in a hash table,
+// and measures the time needed for best, average, and worst-case searches.
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -43,25 +47,30 @@ how to run!!
 
 using namespace std;
 
+// Each dataset row stores a numeric key and its string value.
 struct Record {
     long long number = -1;
     string str = "";
 };
 
+// Hash table using open addressing with linear probing.
 class HashTable {
 public:
     vector<Record> table;
     int size;
 
+    // Allocate a table that is larger than the dataset size.
     HashTable(int n) {
         size = n * 2;
         table.resize(size);
     }
 
+    // Simple modulo-based hash function.
     int hashFunction(long long key) {
         return key % size;
     }
 
+    // Insert a record into the table by probing forward until an empty slot is found.
     void insert(long long key, string val) {
         int index = hashFunction(key);
         while (table[index].number != -1) {
@@ -71,6 +80,7 @@ public:
         table[index].str = val;
     }
 
+    // Search for a key using linear probing.
     bool search(long long target) {
         int index = hashFunction(target);
         int start_index = index;
@@ -83,6 +93,8 @@ public:
         return false;
     }
 
+    // Find the starting index of the longest occupied cluster.
+    // This helps estimate a worst-case probing scenario.
     int getWorstCaseHashIndex() {
         int maxCluster = 0, currentCluster = 0;
         int bestStart = 0, currentStart = -1;
@@ -117,6 +129,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // Read all keys from the CSV file.
     int n = 0;
     string line;
     vector<long long> raw_keys;
@@ -131,6 +144,7 @@ int main(int argc, char* argv[]) {
     }
     file.close();
 
+    // Build the hash table using the loaded dataset.
     HashTable ht(n);
     for (int i = 0; i < n; i++) {
         ht.insert(raw_keys[i], "abcde"); 
@@ -144,7 +158,8 @@ int main(int argc, char* argv[]) {
     volatile int dummy_count = 0;
 
     // ==========================================
-    // 1. BEST CASE PREPARATION
+    // 1. BEST CASE MEASUREMENT
+    //    Search for a key that is already present.
     // ==========================================
     long long bestCaseKey = raw_keys[0]; 
 
@@ -156,7 +171,8 @@ int main(int argc, char* argv[]) {
     chrono::duration<double> timeBest = endBest - startBest;
 
     // ==========================================
-    // 2. AVERAGE CASE PREPARATION
+    // 2. AVERAGE CASE MEASUREMENT
+    //    Search for every key in the dataset once.
     // ==========================================
     auto startAvg = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++) {
@@ -166,7 +182,8 @@ int main(int argc, char* argv[]) {
     chrono::duration<double> timeAvg = endAvg - startAvg;
 
     // ==========================================
-    // 3. WORST CASE PREPARATION
+    // 3. WORST CASE MEASUREMENT
+    //    Search for a key that causes the longest probe chain.
     // ==========================================
     int worstHashIndex = ht.getWorstCaseHashIndex();
     long long worstCaseKey = ((long long)ht.size * 1000000LL) + worstHashIndex; 
@@ -179,7 +196,7 @@ int main(int argc, char* argv[]) {
     chrono::duration<double> timeWorst = endWorst - startWorst;
 
     // ==========================================
-    // PRINT OUTPUTS
+    // SAVE RESULTS TO FILE AND DISPLAY THEM
     // ==========================================
     string baseName = filename;
     size_t dotPos = baseName.find_last_of(".");

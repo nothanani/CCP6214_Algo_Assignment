@@ -79,24 +79,14 @@ void heapSort(vector<Record>& arr)
         heapify(arr, n, i);
     }
 
-    cout << "\n>>> Max-Heap done! Now for the loop .... \n" << endl; 
-
     // move largest to the end, resort, rine and repeat
     for (int i = n - 1; i > 0; i--) 
     {
         swap(arr[0], arr[i]);
         heapify(arr, i, 0);
 
-        // LIVE PROGRESS COUNTER:
-        // Subtract current index 'i' from total elements to see how many have been pushed to the back
-        long long processed = (n - 1) - i; 
-        if (processed % 10000000 == 0 && processed > 0) 
-        {
-            cout << "[Progress] Sorted " << processed << " rows out of " << n << "..." << endl;
-        }
     }
 
-    cout << "\n>>> Sorting complete! Finalizing ..." << endl;
 }
 
 // handle dataset

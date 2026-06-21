@@ -27,10 +27,11 @@ Implement Radix Sort (both the step-by-step version and the full sort)
 Document radix sort's time/space complexity
 Run experiments for radix sort on 10+ input sizes
 
-run code:
-1. g++ -O3 heap_sort.cpp -o heap_sort
-2. ./heap_sort <dataset size>
-
+How to run:
+- be sure to be in the same directory as this file, then follow the steps below:
+1. compile (command : g++ -O3 heap_sort.cpp -o heap_sort )
+2. run (command : ./heap_sort <dataset size>)
+3. dataset will be sorted
 */
 
 
@@ -78,12 +79,24 @@ void heapSort(vector<Record>& arr)
         heapify(arr, n, i);
     }
 
+    cout << "\n>>> Max-Heap done! Now for the loop .... \n" << endl; 
+
     // move largest to the end, resort, rine and repeat
     for (int i = n - 1; i > 0; i--) 
     {
         swap(arr[0], arr[i]);
         heapify(arr, i, 0);
+
+        // LIVE PROGRESS COUNTER:
+        // Subtract current index 'i' from total elements to see how many have been pushed to the back
+        long long processed = (n - 1) - i; 
+        if (processed % 10000000 == 0 && processed > 0) 
+        {
+            cout << "[Progress] Sorted " << processed << " rows out of " << n << "..." << endl;
+        }
     }
+
+    cout << "\n>>> Sorting complete! Finalizing ..." << endl;
 }
 
 // handle dataset

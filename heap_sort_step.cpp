@@ -1,5 +1,5 @@
 /*
-Program : heap_sort_step.cpp
+Program : heap_sort.cpp
 Course: CCP6214 Algorithm Design and Analysis
  Lecture Class: TC6L
  Tutorial Class: T21L
@@ -27,10 +27,12 @@ Implement Radix Sort (both the step-by-step version and the full sort)
 Document radix sort's time/space complexity
 Run experiments for radix sort on 10+ input sizes
 
-run code:
-1. g++ -O3 heap_sort_step.cpp -o heap_sort_step
-2. ./heap_sort_step
-
+How to run:
+- be sure to be in the same directory as this file, then follow the steps below:
+1. compile (command : g++ -O3 heap_sort_step.cpp -o heap_sort_step )
+2. run (command : ./heap_sort_step)
+3. input the dataset size, start row and end row
+3. text file will be generated
 */
 
 #include <iostream>
@@ -46,7 +48,7 @@ struct Record {
     string key;      
 };
 
-// Helper function to maintain the Max-Heap property
+// maxheap
 void heapify(vector<Record>& arr, int n, int i) {
     int largest = i;       
     int left = 2 * i + 1;  
@@ -64,7 +66,7 @@ void heapify(vector<Record>& arr, int n, int i) {
     }
 }
 
-// Function to load the CSV dataset file
+// load dataset
 vector<Record> loadDataset(const string& filename) {
     vector<Record> dataset;
     ifstream file(filename);
@@ -92,27 +94,37 @@ vector<Record> loadDataset(const string& filename) {
     return dataset;
 }
 
+// print steps from <start row> until <end row>
+void logStep(ofstream& outFile, const vector<Record>& arr, int start, int end, const string& label) {
+    outFile << "[";
+    for (int r = start; r <= end; r++) {
+        outFile << arr[r].id << "/" << arr[r].key;
+        if (r < end) {
+            outFile << ", ";
+        }
+    }
+    outFile << "] " << label << "\n";
+}
+
 int main() {
     string sizeStr;
     int start_row, end_row;
-
-    // --- INTERACTIVE TERMINAL PROMPTS ---
-    cout << "==========================================" << endl;
-    cout << "       HEAP SORT STEP-BY-STEP TRACER      " << endl;
-    cout << "==========================================" << endl;
     
     cout << "Enter dataset size (e.g., 1000): ";
     cin >> sizeStr;
     
-    cout << "Enter start row index (e.g., 0): ";
+    cout << "Enter start row index (1-based, e.g., 1): ";
     cin >> start_row;
     
-    cout << "Enter end row index (e.g., 5): ";
+    cout << "Enter end row index (1-based, e.g., 7): ";
     cin >> end_row;
     cout << "------------------------------------------" << endl;
 
+    int start_idx = start_row - 1;
+    int end_idx = end_row - 1;
+
     string inputFilename = "dataset_" + sizeStr + ".csv";
-    string outputFilename = "dataset_" + sizeStr + "_heap_sorted_step_" + to_string(start_row) + "_" + to_string(end_row) + ".txt";
+    string outputFilename = "heap_sort_step_" + to_string(start_row) + "_" + to_string(end_row) + ".txt";
 
     cout << "Loading dataset: " << inputFilename << "..." << endl;
     vector<Record> dataset = loadDataset(inputFilename);
@@ -121,42 +133,36 @@ int main() {
         return 1;
     }
 
-    // Input bounds validation check
-    if (start_row < 0 || end_row >= dataset.size() || start_row > end_row) {
-        cerr << "Error: Invalid row ranges provided! Dataset size is " << dataset.size() << " rows." << endl;
+    if (start_idx < 0 || end_idx >= dataset.size() || start_idx > end_idx) {
+        cerr << "Error: Invalid row ranges provided!" << endl;
         return 1;
     }
 
     ofstream outFile(outputFilename);
     if (!outFile.is_open()) {
-        cerr << "Error: Could not create step output file " << outputFilename << endl;
+        cerr << "Error: Could not create step output file" << endl;
         return 1;
     }
 
     int n = dataset.size();
 
-    // Step 1: Build the Max-Heap
+    // overall maxheap
     for (int i = n / 2 - 1; i >= 0; i--) {
         heapify(dataset, n, i);
     }
 
-    cout << "Max-Heap built successfully. Recording execution steps..." << endl;
+    // initial look after maxheap
+    logStep(outFile, dataset, start_idx, end_idx, "initial");
 
-    int step_counter = 1;
-    // Step 2: One by one extract elements and trace specified rows
+    // continue the sorting
     for (int i = n - 1; i > 0; i--) {
         swap(dataset[0], dataset[i]);
         heapify(dataset, i, 0);
 
-        // Print the header for the current tracking step
-        outFile << "Step " << step_counter << ":\n";
-
-        // Print data only within the requested row boundary slice
-        for (int r = start_row; r <= end_row; r++) {
-            outFile << dataset[r].id << "," << dataset[r].key << "\n";
+        // following steps after initial
+        if (i <= end_idx) {
+            logStep(outFile, dataset, start_idx, end_idx, "i = " + to_string(i));
         }
-        outFile << "---------------------------------------\n";
-        step_counter++;
     }
 
     outFile.close();

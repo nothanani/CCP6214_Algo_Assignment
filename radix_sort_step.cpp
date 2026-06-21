@@ -86,10 +86,14 @@ return data;
 
 //write current state of array to output
 void writeCSV(ofstream &outFile, const vector<Record> &data, const string &label){
-    outFile <<"["<<label<<"]"<<endl;
-    for(const auto &r: data){
-        outFile <<r.number<<","<<r.str<<endl;
+    outFile << "[";
+    for(size_t i = 0; i < data.size(); i++){
+        outFile << data[i].number << "/" << data[i].str;
+        if (i < data.size() - 1) {
+            outFile << ", ";
+        }
     }
+    outFile << "] " << label << endl;
 }
 
 //algo................................................................................................................

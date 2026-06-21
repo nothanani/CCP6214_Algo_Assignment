@@ -1,9 +1,39 @@
-/* 
-Program: hash_table_search.cpp
-How to run:
-g++ hash_table_search.cpp -o hash_table_search -std=c++17 -O3
-./hash_table_search dataset_n.csv
+/*********************************************************************************************
+Program : hash_table_search.cpp
+Course: CCP6214 Algorithm Design and Analysis
+Lecture Class: TC6L
+Tutorial Class: T21L
+Trimester: 2610
+Member_1: 242UC244PT | JASMYNE YAP | jasmyne.yap@student.mmu.edu.my | 01163464323
+Member_2: 242UC244L8 | VIDHYA DARINEY A/P RAJASINGAM | vidhya.dariney.rajasingam@student.mmu.edu.my | 0176506405
+Member_3: 242UC244CK | WAN HANANI IMAN BINTI WAN MOHD AZIDI | wan.hanani.iman@student.mmu.edu.my | 0199660664
+********************************************************************************************
+Task Distribution
+Member_1: Jasmyne Yap - 242UC244PT
+Implement Hash Table Search (including the step-by-step version)
+Document best/average/worst case times
+Write the theory comparison between array-based AVL vs linked-list AVL
+Run experiments for hash table search on 10+ input sizes
+
+Member_2: Vidhya Dariney A/P Rajasingam - 242UC244L8
+Implement Heap Sort (both the step-by-step version and the full sort)
+Document heap sort's time/space complexity
+Run experiments for heap sort on 10+ input sizes
+Write the comparison conclusion between radix and heap sort
+
+Member_3:  Wan Hanani Iman Binti Wan Mohd Azidi - 242UC244CK
+Write the dataset generator program
+Implement Radix Sort (both the step-by-step version and the full sort)
+Document radix sort's time/space complexity
+Run experiments for radix sort on 10+ input sizes
+********************************************************************************************
+how to run!!
+- be sure to be in the same directory as this file, then follow the steps below:
+1. compile (command : g++ hash_table_search.cpp -o hash_table_search -std=c++17 -O3)
+2. run (command : ./hash_table_search <dataset_size>)
+********************************************************************************************
 */
+
 #include <iostream>
 #include <fstream>
 #include <sstream>

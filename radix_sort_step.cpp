@@ -31,7 +31,7 @@ how to run!!
 - be sure to be in the same directory as this file, then follow the steps below:
 1. compile (command : g++ radix_sort_step.cpp -o radix_sort_step -std=c++17 -O3)
 2. run (command : ./radix_sort_step <dataset_size>)
-Example: ./radix_sort dataset_1000.csv 1 1000  
+Example: ./radix_sort_step dataset_1000.csv 1 1000  
 note :                                  ^^1 is start row, 1000 is end row 
 ********************************************************************************************
 */

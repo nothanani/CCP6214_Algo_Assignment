@@ -1,6 +1,6 @@
 //RADIX SORT - STEP BY STEP VER
 /*how to run?
-Example: ./radix_sort dataset_1000.csv 1 1000  
+Example: ./radix_sort dataset_1000.csv 1 1000
 note :                                  ^^1 is start row, 1000 is end row */ 
 
 #include <iostream>
@@ -8,6 +8,7 @@ note :                                  ^^1 is start row, 1000 is end row */
 #include <sstream>
 #include <string>
 #include <vector>
+#include <chrono>
 
 
 using namespace std;
@@ -16,6 +17,15 @@ struct Record{
     long long number;
     string str;
 };
+
+//Estimate the working space used by the record vector.
+size_t estimateSpaceBytes(const vector<Record> &data) {
+    size_t bytes = data.capacity() * sizeof(Record);
+    for (const auto &r : data) {
+        bytes += r.str.capacity();
+    }
+    return bytes;
+}
 
 //read csv file and returns rows
 vector<Record> readCSV(const string& filename, int startRow, int endRow){
@@ -58,6 +68,7 @@ void writeCSV(ofstream &outFile, const vector<Record> &data, const string &label
     for(const auto &r: data){
         outFile <<r.number<<","<<r.str<<endl;
     }
+  
 }
 
 //algo................................................................................................................
@@ -102,23 +113,32 @@ for (int i = 0; i < n; i++) {
 
 
 int main(int argc, char* argv[]){
-    if (argc<4) //check if user provided required args
-    {
-        cerr<<"Usage: "<<argv[0]<<" <input_csv> <output_csv> <step_number>"<<endl;
-        return 1;
-    }   
+    string filename;
+    int startRow = 0;
+    int endRow = 0;
 
-    string filename = argv[1];
-    int startRow    = atoi(argv[2]);
-    int endRow      = atoi(argv[3]);
- 
-    //read the specified rows from the CSV
+    if (argc >= 4) {
+        filename = argv[1];
+        startRow = atoi(argv[2]);
+        endRow = atoi(argv[3]);
+    } else {
+        cout << "Enter the dataset CSV filename (e.g. dataset_1000.csv): ";
+        getline(cin, filename);
+        cout << "Enter the start row (e.g. 1): ";
+        cin >> startRow;
+        cout << "Enter the end row (e.g. 1000): ";
+        cin >> endRow;
+    }
+
     vector<Record> data = readCSV(filename, startRow, endRow);
  
     if (data.empty()) {
         cerr << "Error: No data loaded. Check your row range." << endl;
         return 1;
     }
+
+    auto startTime = chrono::high_resolution_clock::now();
+    size_t estimatedSpace = estimateSpaceBytes(data);
 
     //Build output filename:
     //dataset_1000_radix_sorted_step_startrow_endrow.txt
@@ -150,7 +170,13 @@ int main(int argc, char* argv[]){
     }
  
     outFile.close();
+    auto endTime = chrono::high_resolution_clock::now();
+    auto elapsedMs = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
+
     cout << "Step-by-step output written to: " << outFilename << endl;
+    cout << "Elapsed time: " << elapsedMs << " ms" << endl;
+    cout << "Estimated working space: " << estimatedSpace << " bytes" << endl;
+
  
     return 0;
 }

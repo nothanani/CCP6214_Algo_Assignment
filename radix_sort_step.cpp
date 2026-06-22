@@ -1,15 +1,46 @@
-//RADIX SORT - STEP BY STEP VER
-/*how to run?
-Example: ./radix_sort dataset_1000.csv 1 1000
-note :                                  ^^1 is start row, 1000 is end row */ 
+/*********************************************************************************************
+Program : radix_sort_step.cpp
+Course: CCP6214 Algorithm Design and Analysis
+Lecture Class: TC6L
+Tutorial Class: T21L
+Trimester: 2610
+Member_1: 242UC244PT | JASMYNE YAP | jasmyne.yap@student.mmu.edu.my | 01163464323
+Member_2: 242UC244L8 | VIDHYA DARINEY A/P RAJASINGAM | vidhya.dariney.rajasingam@student.mmu.edu.my | 0176506405
+Member_3: 242UC244CK | WAN HANANI IMAN BINTI WAN MOHD AZIDI | wan.hanani.iman@student.mmu.edu.my | 0199660664
+********************************************************************************************
+Task Distribution
+Member_1: Jasmyne Yap - 242UC244PT
+Implement Hash Table Search (including the step-by-step version)
+Document best/average/worst case times
+Write the theory comparison between array-based AVL vs linked-list AVL
+Run experiments for hash table search on 10+ input sizes
+
+Member_2: Vidhya Dariney A/P Rajasingam - 242UC244L8
+Implement Heap Sort (both the step-by-step version and the full sort)
+Document heap sort's time/space complexity
+Run experiments for heap sort on 10+ input sizes
+Write the comparison conclusion between radix and heap sort
+
+Member_3:  Wan Hanani Iman Binti Wan Mohd Azidi - 242UC244CK
+Write the dataset generator program
+Implement Radix Sort (both the step-by-step version and the full sort)
+Document radix sort's time/space complexity
+Run experiments for radix sort on 10+ input sizes
+********************************************************************************************
+how to run!!
+- be sure to be in the same directory as this file, then follow the steps below:
+1. compile (command : g++ radix_sort_step.cpp -o radix_sort_step -std=c++17 -O3)
+2. run (command : ./radix_sort_step <dataset_size>)
+Example: ./radix_sort dataset_1000.csv 1 1000  
+note :                                  ^^1 is start row, 1000 is end row 
+********************************************************************************************
+*/
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <chrono>
-
 
 using namespace std;
 
@@ -64,11 +95,14 @@ return data;
 
 //write current state of array to output
 void writeCSV(ofstream &outFile, const vector<Record> &data, const string &label){
-    outFile <<"["<<label<<"]"<<endl;
-    for(const auto &r: data){
-        outFile <<r.number<<","<<r.str<<endl;
+    outFile << "[";
+    for(size_t i = 0; i < data.size(); i++){
+        outFile << data[i].number << "/" << data[i].str;
+        if (i < data.size() - 1) {
+            outFile << ", ";
+        }
     }
-  
+    outFile << "] " << label << endl;
 }
 
 //algo................................................................................................................

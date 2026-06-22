@@ -126,7 +126,6 @@ int main() {
 
     string inputFilename = "dataset_" + sizeStr + ".csv";
     string outputFilename = "dataset_" + sizeStr + "_heap_sort_step_" + to_string(start_row) + "_" + to_string(end_row) + ".txt";
-
     cout << "Loading dataset: " << inputFilename << "..." << endl;
     vector<Record> dataset = loadDataset(inputFilename);
     

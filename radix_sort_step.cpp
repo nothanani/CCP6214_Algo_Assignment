@@ -13,19 +13,19 @@ Member_1: Jasmyne Yap - 242UC244PT
 Implement Hash Table Search (including the step-by-step version)
 Document best/average/worst case times
 Write the theory comparison between array-based AVL vs linked-list AVL
-Run experiments for hash table search on 10+ input sizes
+Run experiments for two sorting algorithms (radix sort and heap sort) and one searching algorithm (hash table search) on 10+ input sizes
 
 Member_2: Vidhya Dariney A/P Rajasingam - 242UC244L8
 Implement Heap Sort (both the step-by-step version and the full sort)
 Document heap sort's time/space complexity
-Run experiments for heap sort on 10+ input sizes
+Run experiments for two sorting algorithms (radix sort and heap sort) and one searching algorithm (hash table search) on 10+ input sizes
 Write the comparison conclusion between radix and heap sort
 
 Member_3:  Wan Hanani Iman Binti Wan Mohd Azidi - 242UC244CK
 Write the dataset generator program
 Implement Radix Sort (both the step-by-step version and the full sort)
 Document radix sort's time/space complexity
-Run experiments for radix sort on 10+ input sizes
+Run experiments for two sorting algorithms (radix sort and heap sort) and one searching algorithm (hash table search) on 10+ input sizes
 ********************************************************************************************
 how to run!!
 - be sure to be in the same directory as this file, then follow the steps below:

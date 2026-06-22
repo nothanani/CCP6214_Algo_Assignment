@@ -30,7 +30,7 @@ Run experiments for radix sort on 10+ input sizes
 how to run!!
 - be sure to be in the same directory as this file, then follow the steps below:
 1. compile (command : g++ hash_table_search_step.cpp -o hash_table_step -std=c++17 -O3)
-2. run (command : ./hash_table_search_step <dataset_size>)
+2. run (command : ./hash_table_step <dataset filename> )
 ********************************************************************************************
 */
 

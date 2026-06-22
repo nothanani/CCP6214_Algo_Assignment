@@ -31,12 +31,13 @@ Run experiments for radix sort on 10+ input sizes
 how to run!!
 - be sure to be in the same directory as this file, then follow the steps below:
 1. compile (command : g++ hash_table_search.cpp -o hash_table_search -std=c++17 -O3)
-2. run (command : ./hash_table_search <dataset_size>)
+2. run (command : ./hash_table_search <dataset filename>)
 ********************************************************************************************
 */
 
 // This program reads a dataset file, stores the keys in a hash table,
 // and measures the time needed for best, average, and worst-case searches.
+// It also generates a secondary output file containing exactly 10% of the dataset keys.
 
 #include <iostream>
 #include <fstream>
@@ -44,6 +45,8 @@ how to run!!
 #include <vector>
 #include <string>
 #include <chrono>
+#include <random>
+#include <cmath>
 
 using namespace std;
 
@@ -57,22 +60,22 @@ struct Record {
 class HashTable {
 public:
     vector<Record> table;
-    int size;
+    long long size;
 
     // Allocate a table that is larger than the dataset size.
-    HashTable(int n) {
+    HashTable(long long n) {
         size = n * 2;
         table.resize(size);
     }
 
-    // Simple modulo-based hash function.
-    int hashFunction(long long key) {
-        return key % size;
+    // Simple modulo-based hash function. Uses abs() to safely handle negative keys.
+    long long hashFunction(long long key) {
+        return abs(key) % size;
     }
 
     // Insert a record into the table by probing forward until an empty slot is found.
     void insert(long long key, string val) {
-        int index = hashFunction(key);
+        long long index = hashFunction(key);
         while (table[index].number != -1) {
             index = (index + 1) % size;
         }
@@ -82,8 +85,8 @@ public:
 
     // Search for a key using linear probing.
     bool search(long long target) {
-        int index = hashFunction(target);
-        int start_index = index;
+        long long index = hashFunction(target);
+        long long start_index = index;
 
         while (table[index].number != -1) {
             if (table[index].number == target) return true;
@@ -91,28 +94,6 @@ public:
             if (index == start_index) break;
         }
         return false;
-    }
-
-    // Find the starting index of the longest occupied cluster.
-    // This helps estimate a worst-case probing scenario.
-    int getWorstCaseHashIndex() {
-        int maxCluster = 0, currentCluster = 0;
-        int bestStart = 0, currentStart = -1;
-
-        for (int i = 0; i < size * 2; i++) {
-            int idx = i % size;
-            if (table[idx].number != -1) {
-                if (currentCluster == 0) currentStart = idx;
-                currentCluster++;
-                if (currentCluster > maxCluster) {
-                    maxCluster = currentCluster;
-                    bestStart = currentStart;
-                }
-            } else {
-                currentCluster = 0;
-            }
-        }
-        return bestStart;
     }
 };
 
@@ -130,7 +111,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Read all keys from the CSV file.
-    int n = 0;
+    long long n = 0;
     string line;
     vector<long long> raw_keys;
     
@@ -146,80 +127,120 @@ int main(int argc, char* argv[]) {
 
     // Build the hash table using the loaded dataset.
     HashTable ht(n);
-    for (int i = 0; i < n; i++) {
+    for (long long i = 0; i < n; i++) {
         ht.insert(raw_keys[i], "abcde"); 
     }
 
-    // ==========================================
-    // ANTI-OPTIMIZATION SAFEGUARD
-    // ==========================================
-    // We use a volatile variable to force the compiler to execute the loops.
-    // It prevents 'Dead Code Elimination' caused by the -O3 flag.
-    volatile int dummy_count = 0;
+    // Determine 10% of the dataset size for the search cases.
+    long long ten_percent = n / 10;
+    if (ten_percent == 0) ten_percent = 1; 
+
+    // Prepare the 3 search arrays to hold the keys for each case.
+    vector<long long> best_keys;
+    vector<long long> avg_keys;
+    vector<long long> worst_keys;
+
+    // Setup random number generators for average and worst cases.
+    mt19937 rng(12345); 
+    uniform_int_distribution<long long> distPos(1000000000LL, 9999999999LL);
+    uniform_int_distribution<long long> distNeg(-9999999999LL, -1000000000LL);
+
+    for (long long i = 0; i < ten_percent; i++) {
+        best_keys.push_back(raw_keys[i]);      // Best Case: 10% original keys
+        avg_keys.push_back(distPos(rng));      // Average Case: random 10-digit positive keys
+        worst_keys.push_back(distNeg(rng));    // Worst Case: random 10-digit negative keys
+    }
+
+    // Arrays to store the search results (FOUND / NOT FOUND) without printing during the timer.
+    vector<bool> best_results(ten_percent);
+    vector<bool> avg_results(ten_percent);
+    vector<bool> worst_results(ten_percent);
 
     // ==========================================
     // 1. BEST CASE MEASUREMENT
-    //    Search for a key that is already present.
+    //    Search using 10% of the original keys.
     // ==========================================
-    long long bestCaseKey = raw_keys[0]; 
-
     auto startBest = chrono::high_resolution_clock::now();
-    for (int i = 0; i < n; i++) {
-        if (ht.search(bestCaseKey)) dummy_count++;
+    for (long long i = 0; i < ten_percent; i++) {
+        best_results[i] = ht.search(best_keys[i]);
     }
     auto endBest = chrono::high_resolution_clock::now();
     chrono::duration<double> timeBest = endBest - startBest;
 
     // ==========================================
     // 2. AVERAGE CASE MEASUREMENT
-    //    Search for every key in the dataset once.
+    //    Search using random positive 10-digit keys.
     // ==========================================
     auto startAvg = chrono::high_resolution_clock::now();
-    for (int i = 0; i < n; i++) {
-        if (ht.search(raw_keys[i])) dummy_count++; 
+    for (long long i = 0; i < ten_percent; i++) {
+        avg_results[i] = ht.search(avg_keys[i]);
     }
     auto endAvg = chrono::high_resolution_clock::now();
     chrono::duration<double> timeAvg = endAvg - startAvg;
 
     // ==========================================
     // 3. WORST CASE MEASUREMENT
-    //    Search for a key that causes the longest probe chain.
+    //    Search using random negative keys guaranteed to cause full probing.
     // ==========================================
-    int worstHashIndex = ht.getWorstCaseHashIndex();
-    long long worstCaseKey = ((long long)ht.size * 1000000LL) + worstHashIndex; 
-
     auto startWorst = chrono::high_resolution_clock::now();
-    for (int i = 0; i < n; i++) {
-        if (ht.search(worstCaseKey)) dummy_count++;
+    for (long long i = 0; i < ten_percent; i++) {
+        worst_results[i] = ht.search(worst_keys[i]);
     }
     auto endWorst = chrono::high_resolution_clock::now();
     chrono::duration<double> timeWorst = endWorst - startWorst;
 
     // ==========================================
-    // SAVE RESULTS TO FILE AND DISPLAY THEM
+    // OUTPUT FILE 1: THE RUNNING TIMES
     // ==========================================
     string baseName = filename;
     size_t dotPos = baseName.find_last_of(".");
     if (dotPos != string::npos) baseName = baseName.substr(0, dotPos);
     
-    string outFilename = "hash_table_search_" + baseName + ".txt";
-    ofstream outFile(outFilename);
+    string file1Name = "hash_table_times_" + baseName + ".txt";
+    ofstream outFile1(file1Name);
     
-    // We force a 6-decimal precision specifically for Windows/Powershell formatting
-    outFile.precision(6);
-    outFile << fixed;
-    outFile << "Best case time: " << timeBest.count() << " seconds\n";
-    outFile << "Average case time: " << timeAvg.count() << " seconds\n";
-    outFile << "Worst case time: " << timeWorst.count() << " seconds\n";
-    outFile.close();
+    outFile1.precision(6);
+    outFile1 << fixed;
+    outFile1 << "--- RUNNING TIMES (for " << ten_percent << " searches) ---\n";
+    outFile1 << "Best case time: " << timeBest.count() << " seconds\n";
+    outFile1 << "Average case time: " << timeAvg.count() << " seconds\n";
+    outFile1 << "Worst case time: " << timeWorst.count() << " seconds\n";
+    outFile1.close();
 
+    // ==========================================
+    // OUTPUT FILE 2: THE 10% DATA & RESULTS
+    // ==========================================
+    string file2Name = "hash_table_10percent_data_" + baseName + ".txt";
+    ofstream outFile2(file2Name);
+
+    outFile2 << "--- SEARCH RESULTS (Best Case: 10% Original Keys) ---\n";
+    for(long long i = 0; i < ten_percent; i++) {
+        outFile2 << best_keys[i] << " : " << (best_results[i] ? "FOUND" : "NOT FOUND") << "\n";
+    }
+
+    outFile2 << "\n--- SEARCH RESULTS (Average Case: 10% Random Positive Keys) ---\n";
+    for(long long i = 0; i < ten_percent; i++) {
+        outFile2 << avg_keys[i] << " : " << (avg_results[i] ? "FOUND" : "NOT FOUND") << "\n";
+    }
+
+    outFile2 << "\n--- SEARCH RESULTS (Worst Case: 10% Negative Keys) ---\n";
+    for(long long i = 0; i < ten_percent; i++) {
+        outFile2 << worst_keys[i] << " : " << (worst_results[i] ? "FOUND" : "NOT FOUND") << "\n";
+    }
+    outFile2.close();
+
+    // ==========================================
+    // COMMAND PROMPT OUTPUT
+    // ==========================================
     cout.precision(6);
     cout << fixed;
     cout << "Dataset Size (n): " << n << endl;
+    cout << "Searches Performed per Case (10%): " << ten_percent << endl;
     cout << "Best case time: " << timeBest.count() << " seconds" << endl;
     cout << "Average case time: " << timeAvg.count() << " seconds" << endl;
     cout << "Worst case time: " << timeWorst.count() << " seconds" << endl;
-    cout << "Running times written to: " << outFilename << "\n" << endl;
+    cout << "-> Created File 1 (Times): " << file1Name << endl;
+    cout << "-> Created File 2 (10% Data): " << file2Name << "\n" << endl;
 
     return 0;
 }
